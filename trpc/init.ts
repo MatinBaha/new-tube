@@ -1,46 +1,14 @@
 import { db } from '@/db';
 import { users } from '@/db/schema';
 import { rateLimit } from '@/lib/ratelimit';
-import { auth } from '@clerk/nextjs/server';
+import { auth, clerkClient } from '@clerk/nextjs/server';
 import { initTRPC, TRPCError } from '@trpc/server';
 import { eq } from 'drizzle-orm';
-//  
-// /**
-//  * This context creator accepts `headers` so it can be reused in both
-//  * the RSC server caller (where you pass `next/headers`) and the
-//  * API route handler (where you pass the request headers).
-//  */
-// export const createTRPCContext = async (opts: { headers: Headers }) => {
-//   // const user = await auth(opts.headers);
-//   return { userId: 'user_123' };
-// };
-//  
-// // Avoid exporting the entire t-object
-// // since it's not very descriptive.
-// // For instance, the use of a t variable
-// // is common in i18n libraries.
-// const t = initTRPC
-//   .context<Awaited<ReturnType<typeof createTRPCContext>>>()
-//   .create({
-//     /**
-//      * @see https://trpc.io/docs/server/data-transformers
-//      */
-//     // transformer: superjson,
-//   });
-//  
-// // Base router and procedure helpers
-// export const createTRPCRouter = t.router;
-// export const createCallerFactory = t.createCallerFactory;
-// export const baseProcedure = t.procedure;
-import {cache} from 'react';
+import { cache } from 'react';
 import superjson from 'superjson';
 
 export const createTRPCContext = cache(async () => {
   const { userId } = await auth();
-
-  console.log("=== TRPC CONTEXT DEBUG ===");
-  console.log("User ID:", userId);
-  console.log("==========================");
 
   return { clerkUserId: userId };
 });
@@ -55,38 +23,60 @@ export const createTRPCRouter = t.router;
 export const createCallerFactory = t.createCallerFactory;
 export const baseProcedure = t.procedure;
 export const protectedProcedure = t.procedure.use(async function isAuthed(opts) {
-  const {ctx} = opts;
+  const { ctx } = opts;
 
-  console.log("--> 1. ctx.clerkUserId:", ctx.clerkUserId);
-
-  if(!ctx.clerkUserId) {
-    console.log("--> FAILED AT STEP 1: ctx.clerkUserId is missing or undefined");
-    throw new TRPCError({ code: 'UNAUTHORIZED'});
+  if (!ctx.clerkUserId) {
+    throw new TRPCError({ code: 'UNAUTHORIZED' });
   }
 
-  const [user] = await db
-  .select()
-  .from(users)
-  .where(eq(users.clerkId, ctx.clerkUserId))
-  .limit(1);
+  let [user] = await db
+    .select()
+    .from(users)
+    .where(eq(users.clerkId, ctx.clerkUserId))
+    .limit(1);
 
-  console.log("--> 2. Database query result:", user);
+  if (!user) {
+    try {
+      const client = await clerkClient();
+      const clerkUser = await client.users.getUser(ctx.clerkUserId);
 
-  if(!user) {
-    console.log(`--> FAILED AT STEP 2: No user in DB matching clerkId = "${ctx.clerkUserId}"`);
-    throw new TRPCError({ code: 'UNAUTHORIZED'});
+      if (clerkUser) {
+        const name =
+          `${clerkUser.firstName ?? ''} ${clerkUser.lastName ?? ''}`.trim() ||
+          clerkUser.username ||
+          'User';
+        const imageUrl = clerkUser.imageUrl;
+
+        const [createdUser] = await db
+          .insert(users)
+          .values({
+            clerkId: ctx.clerkUserId,
+            name,
+            imageUrl,
+          })
+          .returning();
+
+        user = createdUser;
+      }
+    } catch (error) {
+      console.error('Failed to auto-sync user from Clerk:', error);
+    }
   }
 
-  const {success} = await rateLimit.limit(user.id);
+  if (!user) {
+    throw new TRPCError({ code: 'UNAUTHORIZED' });
+  }
 
-  if(!success) {
-    throw new TRPCError({code: "TOO_MANY_REQUESTS"});
+  const { success } = await rateLimit.limit(user.id);
+
+  if (!success) {
+    throw new TRPCError({ code: 'TOO_MANY_REQUESTS' });
   }
 
   return opts.next({
     ctx: {
       ...ctx,
-      user
-    }
-  })
-})
+      user,
+    },
+  });
+});

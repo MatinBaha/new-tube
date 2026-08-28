@@ -1,6 +1,6 @@
-import { useIntersectionObserver } from '@/hooks/use-intersection-observer';
-import { useEffect } from 'react';
-import { Button } from './ui/button';
+import { useIntersectionObserver } from "@/hooks/use-intersection-observer";
+import { useEffect } from "react";
+import { Button } from "./ui/button";
 
 interface InfiniteScrollProps {
   isManual?: boolean;
@@ -17,7 +17,7 @@ export const InfiniteScroll = ({
 }: InfiniteScrollProps) => {
   const { targetRef, isIntersecting } = useIntersectionObserver({
     threshold: 0.5,
-    rootMargin: '100px',
+    rootMargin: "100px",
   });
 
   useEffect(() => {
@@ -37,10 +37,11 @@ export const InfiniteScroll = ({
       <div ref={targetRef} className="h-1" />
       {hasNextPage ? (
         <Button
+          onClick={fetchNextPage}
           variant="secondary"
           disabled={!hasNextPage || isFetchingNextPage}
         >
-          {isFetchingNextPage ? 'Loading...' : 'Load More'}
+          {isFetchingNextPage ? "Loading..." : "Load More"}
         </Button>
       ) : (
         <p className="text-xs text-muted-foreground">

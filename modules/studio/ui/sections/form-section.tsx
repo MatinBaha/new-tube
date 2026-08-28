@@ -290,7 +290,7 @@ const FormSectionSuspense = ({ videoId }: PageProps) => {
               <div className="flex h-fit flex-col gap-4 overflow-hidden rounded-xl bg-[#f9f9f9]">
                 <div className="relative aspect-video overflow-hidden">
                   <VideoPlayer
-                    playerbackId={video.muxPlaybackId}
+                    playbackId={video.muxPlaybackId}
                     thumbnailUrl={video.thumbnailUrl}
                   />
                 </div>

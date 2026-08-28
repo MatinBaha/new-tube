@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="100%" height="100%">
+  <defs>
+    <!-- Clip path to keep the avatar within the circular frame -->
+    <clipPath id="circle-clip">
+      <circle cx="64" cy="64" r="64" />
+    </clipPath>
+  </defs>
+
+  <!-- Circular background -->
+  <circle cx="64" cy="64" r="64" fill="#E2E8F0" />
+
+  <!-- Avatar silhouette -->
+  <g clip-path="url(#circle-clip)" fill="#94A3B8">
+    <!-- Head -->
+    <circle cx="64" cy="46" r="22" />
+    
+    <!-- Shoulders / Torso -->
+    <path d="M64 76 C41 76 24 93 24 114 C24 120 28 128 34 128 H94 C100 128 104 120 104 114 C104 93 87 76 64 76 Z" />
+  </g>
+</svg>
