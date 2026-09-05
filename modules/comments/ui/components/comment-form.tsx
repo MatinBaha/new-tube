@@ -18,10 +18,19 @@ import z from "zod";
 
 interface CommentFormProps {
   videoId: string;
+  parentId?: string;
   onSuccess?: () => void;
+  onCancel?: () => void;
+  variant?: "comment" | "reply";
 }
 
-export const CommentForm = ({ videoId, onSuccess }: CommentFormProps) => {
+export const CommentForm = ({
+  videoId,
+  parentId,
+  onSuccess,
+  onCancel,
+  variant = "comment",
+}: CommentFormProps) => {
   const { user } = useUser();
 
   const utils = trpc.useUtils();
@@ -44,10 +53,16 @@ export const CommentForm = ({ videoId, onSuccess }: CommentFormProps) => {
   const form = useForm<z.infer<typeof commentInsertSchema>>({
     resolver: zodResolver(commentInsertSchema.omit({ userId: true })),
     defaultValues: {
+      parentId,
       videoId,
       comment: "",
     },
   });
+
+  const handleCancel = () => {
+    form.reset();
+    onCancel?.();
+  };
 
   const handleSubmit = (values: z.infer<typeof commentInsertSchema>) => {
     create.mutate(values);
@@ -73,7 +88,11 @@ export const CommentForm = ({ videoId, onSuccess }: CommentFormProps) => {
                 <FormControl>
                   <Textarea
                     {...field}
-                    placeholder="Add a comment..."
+                    placeholder={
+                      variant === "comment"
+                        ? "Add a comment..."
+                        : "Reply to this comment"
+                    }
                     className="min-h-0 resize-none overflow-hidden bg-transparent"
                   />
                 </FormControl>
@@ -82,8 +101,18 @@ export const CommentForm = ({ videoId, onSuccess }: CommentFormProps) => {
             )}
           />
           <div className="mt-2 flex justify-end gap-2">
-            <Button disabled={create.isPending} type="submit" className="sm">
-              Comment
+            {onCancel && (
+              <Button
+                disabled={create.isPending}
+                onClick={handleCancel}
+                type="button"
+                variant="ghost"
+              >
+                Cancel
+              </Button>
+            )}
+            <Button disabled={create.isPending} type="submit" size="sm">
+              {variant === "reply" ? "Reply" : "Comment"}
             </Button>
           </div>
         </div>

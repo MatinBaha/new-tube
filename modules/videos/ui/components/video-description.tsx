@@ -30,7 +30,7 @@ export const VideoDescription = ({
           {isExpanded ? expandedViews : compactViews} Views
         </span>
         <span className="font-medium">
-          {isExpanded ? expandedDate : compactDate} Date
+          {isExpanded ? expandedDate : compactDate}
         </span>
       </div>
       <div className="relative">

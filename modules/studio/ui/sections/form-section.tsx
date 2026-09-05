@@ -102,6 +102,16 @@ const FormSectionSuspense = ({ videoId }: PageProps) => {
       toast.error("Something went wrong");
     },
   });
+  const revalidate = trpc.videos.revalidate.useMutation({
+    onSuccess: () => {
+      utils.studio.getMany.invalidate();
+      utils.studio.getOne.invalidate({ id: videoId });
+      toast.success("Video revalidated");
+    },
+    onError: () => {
+      toast.error("Something went wrong");
+    },
+  });
   const restore = trpc.videos.restoreThumbnail.useMutation({
     onSuccess: () => {
       utils.studio.getMany.invalidate();
@@ -163,9 +173,17 @@ const FormSectionSuspense = ({ videoId }: PageProps) => {
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem
                     onClick={() => remove.mutate({ id: videoId })}
+                    disabled={remove.isPending}
                   >
                     <TrashIcon className="mr-2 size-4" />
                     Delete
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => revalidate.mutate({ id: videoId })}
+                    disabled={revalidate.isPending}
+                  >
+                    <RotateCcwIcon className="mr-2 size-4" />
+                    Revalidate
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
