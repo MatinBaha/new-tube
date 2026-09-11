@@ -3,14 +3,49 @@
 import { InfiniteScroll } from "@/components/infinite-scroll";
 import { DEFAULT_LIMIT } from "@/constants";
 import { trpc } from "@/trpc/client";
-import { VideoRowCard } from "../ui/components/video-row-card";
-import { VideoGridCard } from "../ui/components/video-grid-card";
+import {
+  VideoRowCard,
+  VideoRowCardSkeleton,
+} from "../ui/components/video-row-card";
+import {
+  VideoGridCard,
+  VideoGridCardSkeleton,
+} from "../ui/components/video-grid-card";
+import { Suspense } from "react";
+import { ErrorBoundary } from "react-error-boundary";
 
 interface SuggestionsSectionProps {
   videoId: string;
 }
 
 export const SuggestionsSection = ({ videoId }: SuggestionsSectionProps) => {
+  return (
+    <Suspense fallback={<SuggestionsSectionSkeleton />}>
+      <ErrorBoundary fallback={<p>Error...</p>}>
+        <SuggestionsSectionSuspense videoId={videoId} />
+      </ErrorBoundary>
+    </Suspense>
+  );
+};
+
+const SuggestionsSectionSkeleton = () => {
+  return (
+    <>
+      <div className="hidden space-y-3 md:block">
+        {Array.from({ length: 8 }).map((_, index) => (
+          <VideoRowCardSkeleton key={index} size="compact" />
+        ))}
+      </div>
+      <div className="grid grid-cols-2 gap-2 md:hidden">
+        {Array.from({ length: 10 }).map((_, index) => (
+          <VideoGridCardSkeleton key={index} />
+        ))}
+      </div>
+    </>
+  );
+};
+
+const SuggestionsSectionSuspense = ({ videoId }: SuggestionsSectionProps) => {
   const [suggestions, query] =
     trpc.suggestions.getMany.useSuspenseInfiniteQuery(
       {
@@ -52,4 +87,3 @@ export const SuggestionsSection = ({ videoId }: SuggestionsSectionProps) => {
     </>
   );
 };
-

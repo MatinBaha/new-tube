@@ -51,7 +51,7 @@ export const FilterCarousel = ({
       {/* Left fade */}
       <div
         className={cn(
-          'absolute left-12 top-0 bottom-0 w-12 z-10 bg-gradient-to-r from-white to-transparent pointer-events-none',
+          'absolute left-12 top-0 bottom-0 w-12 z-10 bg-gradient-to-r from-background to-transparent pointer-events-none',
           current === 1 && 'hidden',
         )}
       />
@@ -71,13 +71,8 @@ export const FilterCarousel = ({
               className="pl-3 basis-auto"
             >
               <Badge
-                // variant={!value ? 'default' : 'secondary'}
-                className={cn(
-                  'rounded-lg px-3 py-1 cursor-pointer whitespace-nowrap text-sm',
-                  value == null
-                    ? 'bg-gray-900 text-white hover:bg-gray-900'
-                    : 'bg-gray-200 text-gray-900 hover:bg-gray-300',
-                )}
+                variant={value == null ? 'default' : 'secondary'}
+                className="rounded-lg px-3 py-1 cursor-pointer whitespace-nowrap text-sm"
               >
                 All
               </Badge>
@@ -86,7 +81,7 @@ export const FilterCarousel = ({
           {isLoading &&
             Array.from({ length: 14 }).map((_, index) => (
               <CarouselItem key={index} className="pl-3 basis-auto">
-                <Skeleton className="rounded-lg px-3 py-1 h-full text-sm w-[100px] font-semibold bg-gray-300">
+                <Skeleton className="rounded-lg px-3 py-1 h-full text-sm w-[100px] font-semibold">
                   &nbsp;
                 </Skeleton>
               </CarouselItem>
@@ -99,13 +94,8 @@ export const FilterCarousel = ({
                 onClick={() => onSelect(item.value)}
               >
                 <Badge
-                  // variant={item.value === null ? 'default' : 'secondary'}
-                  className={cn(
-                    'rounded-lg px-3 py-1 cursor-pointer whitespace-nowrap text-sm',
-                    value === item.value
-                      ? 'bg-gray-900 text-white hover:bg-gray-900'
-                      : 'bg-gray-200 text-gray-900 hover:bg-gray-300',
-                  )}
+                  variant={value === item.value ? 'default' : 'secondary'}
+                  className="rounded-lg px-3 py-1 cursor-pointer whitespace-nowrap text-sm"
                 >
                   {item.label}
                 </Badge>
@@ -119,7 +109,7 @@ export const FilterCarousel = ({
       {/* Right fade */}
       <div
         className={cn(
-          'absolute right-12 top-0 bottom-0 w-12 z-10 bg-gradient-to-l from-white to-transparent pointer-events-none',
+          'absolute right-12 top-0 bottom-0 w-12 z-10 bg-gradient-to-l from-background to-transparent pointer-events-none',
           current === count && 'hidden',
         )}
       />

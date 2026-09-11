@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -15,6 +16,7 @@ import {
   Trash2Icon,
 } from "lucide-react";
 import { toast } from "sonner";
+import { PlaylistAddModal } from "@/modules/playlists/ui/components/playlist-add-modal";
 
 interface VideoMenuProps {
   videoId: string;
@@ -27,27 +29,35 @@ export const VideoMenu = ({
   variant = "ghost",
   onRemove,
 }: VideoMenuProps) => {
+  const [isOpenPlaylistModal, setIsOpenPlaylistModal] = useState(false);
+
   const onShare = () => {
     const fullUrl = `${process.env.VERCEL_URL || "http://localhost:3000"}/videos/${videoId}`;
     navigator.clipboard.writeText(fullUrl);
     toast.success("Link coppied to clipboard");
   };
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant={variant} size="icon" className="rounded-full">
-          <MoreVerticalIcon />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
-        <DropdownMenuItem onClick={onShare}>
-          <ShareIcon />
-          Share
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => {}}>
-          <ListPlusIcon />
-          Add to Playlist
-        </DropdownMenuItem>
+    <>
+      <PlaylistAddModal
+        videoId={videoId}
+        open={isOpenPlaylistModal}
+        onOpenChange={setIsOpenPlaylistModal}
+      />
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant={variant} size="icon" className="rounded-full">
+            <MoreVerticalIcon />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
+          <DropdownMenuItem onClick={onShare}>
+            <ShareIcon />
+            Share
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => setIsOpenPlaylistModal(true)}>
+            <ListPlusIcon />
+            Add to Playlist
+          </DropdownMenuItem>
         {onRemove && (
           <DropdownMenuItem onClick={() => {}}>
             <Trash2Icon />
@@ -64,6 +74,7 @@ export const VideoMenu = ({
           Download video
         </DropdownMenuItem>
       </DropdownMenuContent>
-    </DropdownMenu>
+      </DropdownMenu>
+    </>
   );
 };

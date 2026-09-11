@@ -5,4 +5,14 @@ export type VideoGetOneOutput =
   inferRouterOutputs<AppRouter>["videos"]["getOne"];
 
 export type VideoGetManyOutput =
-  inferRouterOutputs<AppRouter>["suggestions"]["getMany"];
+  inferRouterOutputs<AppRouter>["videos"]["getMany"];
+
+export type VideoGetManySubscribedOutput =
+  inferRouterOutputs<AppRouter>["videos"]["getManySubscribed"];
+
+export type VideoGetManyHistoryOutput =
+  inferRouterOutputs<AppRouter>["videos"]["getManyHistory"];
+
+export type VideoGetManyLikedOutput =
+  inferRouterOutputs<AppRouter>["videos"]["getManyLiked"];
+

@@ -1,6 +1,7 @@
-import Image from 'next/image';
-import placeholder from '@/public/placeholder.svg';
-import { formatDuration } from '@/lib/utils';
+import Image from "next/image";
+import placeholder from "@/public/placeholder.svg";
+import { formatDuration } from "@/lib/utils";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface VideoThumbnailProps {
   imageUrl?: string | null;
@@ -9,6 +10,14 @@ interface VideoThumbnailProps {
   duration: number;
 }
 
+export const VideoThumbnailSkeleton = () => {
+  return (
+    <div className="relative aspect-video w-full overflow-hidden rounded-xl">
+      <Skeleton className="size-full" />
+    </div>
+  );
+};
+
 export const VideoThumbnail = ({
   imageUrl,
   previewUrl,
@@ -16,8 +25,8 @@ export const VideoThumbnail = ({
   duration,
 }: VideoThumbnailProps) => {
   return (
-    <div className="relative group">
-      <div className="relative w-full overflow-hidden rounded-xl aspect-video">
+    <div className="group relative">
+      <div className="relative aspect-video w-full overflow-hidden rounded-xl">
         <Image
           src={imageUrl ?? placeholder}
           alt={title}
@@ -32,7 +41,7 @@ export const VideoThumbnail = ({
         />
       </div>
 
-      <div className="absolute bottom-2 right-2 px-1 py-0.5 rounded bg-black text-white text-xs font-medium">
+      <div className="absolute bottom-2 right-2 rounded bg-black px-1 py-0.5 text-xs font-medium text-white">
         {formatDuration(duration)}
       </div>
     </div>
